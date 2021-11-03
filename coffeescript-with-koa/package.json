@@ -1,0 +1,23 @@
+{
+  "name": "coffeescript-with-koa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "coffee --compile --watch ./index.coffee",
+    "dev": "nodemon -e js ./index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "coffeescript": "^2.6.1"
+  },
+  "dependencies": {
+    "faker": "^5.5.3",
+    "koa": "^2.13.4",
+    "koa-better-router": "^2.1.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-json": "^2.0.2"
+  }
+}
