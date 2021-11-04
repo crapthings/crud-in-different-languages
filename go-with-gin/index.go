@@ -1,6 +1,9 @@
 package main
 
-import ("fmt")
+import (
+  "fmt"
+  "strconv"
+)
 import "reflect"
 import "github.com/gin-gonic/gin"
 import "syreclabs.com/go/faker"
@@ -46,23 +49,38 @@ func main () {
     })
 
     api.PUT("/users/:_id", func (c *gin.Context) {
-      // _id := c.Param("_id")
-      for _, item := range users {
+      _id, _ := strconv.Atoi(c.Param("_id"))
+      for index, item := range users {
         id := reflect.Indirect(reflect.ValueOf(item)).FieldByName("ID")
-        fmt.Println(item, id)
+        if id.Interface().(int) == _id {
+          var user User
+          _user := &users[index]
+          if c.ShouldBind(&user) == nil {
+            _user.Username = user.Username
+            _user.Email = user.Email
+            _user.Fullname = user.Fullname
+          }
+          c.JSON(200, _user)
+          return
+        }
       }
-      c.String(200, "go with gin")
+      c.JSON(200, nil)
     })
 
     api.DELETE("/users/:_id", func (c *gin.Context) {
-      // _id := c.Param("_id")
-      for _, item := range users {
+      _id, _ := strconv.Atoi(c.Param("_id"))
+      for index, item := range users {
         id := reflect.Indirect(reflect.ValueOf(item)).FieldByName("ID")
-        fmt.Println(item, id)
+        if id.Interface().(int) == _id {
+          users = append(users[:index], users[index+1:]...)
+          c.JSON(200, _id)
+          return
+        }
       }
-      c.String(200, "go with gin")
+      c.JSON(200, nil)
     })
   }
 
+  fmt.Println("server is running at 3000")
   router.Run(":3000")
 }
