@@ -8,8 +8,8 @@ fake = Faker()
 def createUser(idx):
   return {
     '_id': idx + 1,
+    'email': fake.email(),
     'fullname': fake.name(),
-    'email': fake.email()
   }
 
 users = list((createUser(idx) for idx in range(10)))
@@ -21,11 +21,14 @@ async def getUsers(req):
   return json(users)
 
 @app.post('/api/users')
-async def createUsers(req):
-  return json(users)
+async def postUser(req):
+  lastId = users[len(users) - 1]['_id']
+  user = createUser(lastId)
+  users.append(user)
+  return json(user)
 
 @app.put('/api/users/<_id>')
-async def createUsers(req, _id):
+async def putUser(req, _id):
   id = int(_id)
   userIndex = next((userIdx for userIdx, user in enumerate(users) if user['_id'] is id), None)
   if userIndex is not None:
@@ -36,18 +39,17 @@ async def createUsers(req, _id):
     return json(None)
 
 @app.delete('/api/users/<_id>')
-async def createUsers(req, _id):
+async def deleteUser(req, _id):
   id = int(_id)
-
-  for userIdx, user in enumerate(users):
-    if user['_id'] is id:
-      del users[userIdx]
-      break
-
-  return json(_id)
+  userIndex = next((userIdx for userIdx, user in enumerate(users) if user['_id'] is id), None)
+  if userIndex is not None:
+    del users[userIndex]
+    return json(_id)
+  else:
+    return json(None)
 
 @app.get('/')
-async def hello_world(req):
+async def index(req):
   return text('python with sanic')
 
 app.run(host='0.0.0.0', port=3000, access_log=False)
