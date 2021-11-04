@@ -10,7 +10,7 @@ const createUser = (_id) => ({
   username: faker.internet.userName(),
   email: faker.internet.email(),
   fullname: faker.name.findName(),
-  avatarUrl: faker.internet.avatar (),
+  avatarUrl: faker.internet.avatar(),
 })
 
 const users = Array.from({ length: 10 }, (_, idx) => idx + 1).map(createUser)
