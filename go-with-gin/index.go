@@ -72,7 +72,7 @@ func main () {
       for index, item := range users {
         id := reflect.Indirect(reflect.ValueOf(item)).FieldByName("ID")
         if id.Interface().(int) == _id {
-          users = append(users[:index], users[index+1:]...)
+          users = append(users[:index], users[index + 1:]...)
           c.JSON(200, _id)
           return
         }
