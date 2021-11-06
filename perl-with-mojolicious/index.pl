@@ -1,21 +1,19 @@
 use Mojolicious::Lite -signatures;
-use Mojo::JSON qw(decode_json encode_json to_json);
+use Data::Faker;
 
+my $faker = Data::Faker -> new();
+
+our $count = 0;
 our @users = ();
-# push @users, { fullname => 'blah blah blah' } for 1..10;
 
-# map {print} @users;
+push @users, { fullname => $faker -> name } for 1..10;
 
-get '/' => {
-  text => 'perl with mojolicious'
+for my $user (@users) {
+  $user -> { _id } = $count;
+  $count++;
 };
 
-# get '/api/users' => {
-#   json => @users
-# };
 
-# put '/test' => sub ($c) {
-#   $c->render(json => $chars);
-# };
+get '/' => text => 'perl with mojolicious';
 
 app->start;
