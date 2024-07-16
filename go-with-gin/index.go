@@ -2,82 +2,102 @@ package main
 
 import (
   "fmt"
+  "net/http"
   "strconv"
+
+  "github.com/gin-gonic/gin"
+  "syreclabs.com/go/faker"
 )
-import "reflect"
-import "github.com/gin-gonic/gin"
-import "syreclabs.com/go/faker"
 
 type User struct {
-  ID int `json:"_id" uri:"_id"`
+  ID       int    `json:"_id" uri:"_id"`
   Username string `json:"username"`
-  Email string `json:"email"`
+  Email    string `json:"email"`
   Fullname string `json:"fullname"`
 }
 
-func createUser (idx int) (user User) {
-  user.ID = idx
-  user.Username = faker.Internet().UserName()
-  user.Email = faker.Internet().Email()
-  user.Fullname = faker.Name().Name()
-  return user
+func createUser (idx int) User {
+  return User{
+    ID:       idx,
+    Username: faker.Internet().UserName(),
+    Email:    faker.Internet().Email(),
+    Fullname: faker.Name().Name(),
+  }
 }
 
 func main () {
-  users := []User{}
+  users := make(map[int]User)
 
   for i := 1; i <= 10; i++ {
-    users = append(users, createUser(i))
+    users[i] = createUser(i)
   }
 
   router := gin.Default()
 
-  router.GET("/", func (c *gin.Context) {
-    c.String(200, "go with gin")
+  router.GET("/", func(c *gin.Context) {
+    c.String(http.StatusOK, "go with gin")
   })
 
   api := router.Group("/api")
   {
     api.GET("/users", func (c *gin.Context) {
-      c.IndentedJSON(200, users)
+      userList := make([]User, 0, len(users))
+
+      for _, user := range users {
+        userList = append(userList, user)
+      }
+
+      c.JSON(http.StatusOK, userList)
     })
 
     api.POST("/users", func (c *gin.Context) {
-      lastId := users[len(users) - 1].ID
-      users = append(users, createUser(lastId + 1))
-      c.IndentedJSON(200, users)
+      newID := len(users) + 1
+      newUser := createUser(newID)
+      users[newID] = newUser
+      c.JSON(http.StatusCreated, newUser)
     })
 
     api.PUT("/users/:_id", func (c *gin.Context) {
-      _id, _ := strconv.Atoi(c.Param("_id"))
-      for index, item := range users {
-        id := reflect.Indirect(reflect.ValueOf(item)).FieldByName("ID")
-        if id.Interface().(int) == _id {
-          var user User
-          _user := &users[index]
-          if c.ShouldBind(&user) == nil {
-            _user.Username = user.Username
-            _user.Email = user.Email
-            _user.Fullname = user.Fullname
-          }
-          c.JSON(200, _user)
-          return
-        }
+      id, err := strconv.Atoi(c.Param("_id"))
+
+      if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+        return
       }
-      c.JSON(200, nil)
+
+      user, exists := users[id]
+
+      if !exists {
+        c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+        return
+      }
+
+      if err := c.BindJSON(&user); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+      }
+
+      users[id] = user
+
+      c.JSON(http.StatusOK, user)
     })
 
     api.DELETE("/users/:_id", func (c *gin.Context) {
-      _id, _ := strconv.Atoi(c.Param("_id"))
-      for index, item := range users {
-        id := reflect.Indirect(reflect.ValueOf(item)).FieldByName("ID")
-        if id.Interface().(int) == _id {
-          users = append(users[:index], users[index + 1:]...)
-          c.JSON(200, _id)
-          return
-        }
+      id, err := strconv.Atoi(c.Param("_id"))
+
+      if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+        return
       }
-      c.JSON(200, nil)
+
+      if _, exists := users[id]; !exists {
+        c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+        return
+      }
+
+      delete(users, id)
+
+      c.JSON(http.StatusOK, gin.H{"message": "User deleted"})
     })
   }
 
