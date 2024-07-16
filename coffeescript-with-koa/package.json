@@ -5,19 +5,20 @@
   "main": "index.js",
   "scripts": {
     "watch": "coffee --compile --watch ./index.coffee",
-    "dev": "nodemon -e js ./index.js"
+    "dev": "concurrently \"npm run watch\" \"nodemon -e js ./index.js\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "coffeescript": "^2.6.1"
+    "coffeescript": "^2.7.0",
+    "concurrently": "^8.2.2"
   },
   "dependencies": {
-    "faker": "^5.5.3",
-    "koa": "^2.13.4",
+    "faker": "^6.6.6",
+    "koa": "^2.15.3",
     "koa-better-router": "^2.1.1",
-    "koa-bodyparser": "^4.3.0",
+    "koa-bodyparser": "^4.4.1",
     "koa-json": "^2.0.2"
   }
 }
