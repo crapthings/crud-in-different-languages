@@ -1,0 +1,2 @@
+requires 'Mojolicious', '9.37';
+requires 'Data::Faker';
