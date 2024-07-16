@@ -5,7 +5,7 @@ from faker import Faker
 
 fake = Faker()
 
-def createUser(idx):
+def createUser (idx):
   return {
     '_id': idx + 1,
     'email': fake.email(),
@@ -17,18 +17,18 @@ users = list((createUser(idx) for idx in range(10)))
 app = Sanic('server')
 
 @app.get('/api/users')
-async def getUsers(req):
+async def getUsers (req):
   return json(users)
 
 @app.post('/api/users')
-async def postUser(req):
+async def postUser (req):
   lastId = users[len(users) - 1]['_id']
   user = createUser(lastId)
   users.append(user)
   return json(user)
 
 @app.put('/api/users/<_id>')
-async def putUser(req, _id):
+async def putUser (req, _id):
   id = int(_id)
   userIndex = next((userIdx for userIdx, user in enumerate(users) if user['_id'] is id), None)
   if userIndex is not None:
@@ -39,7 +39,7 @@ async def putUser(req, _id):
     return json(None)
 
 @app.delete('/api/users/<_id>')
-async def deleteUser(req, _id):
+async def deleteUser (req, _id):
   id = int(_id)
   userIndex = next((userIdx for userIdx, user in enumerate(users) if user['_id'] is id), None)
   if userIndex is not None:
@@ -52,4 +52,5 @@ async def deleteUser(req, _id):
 async def index(req):
   return text('python with sanic')
 
-app.run(host='0.0.0.0', port=3000, access_log=False)
+if __name__ == '__main__':
+  app.run(host = '0.0.0.0', port = 3000, access_log = False)
