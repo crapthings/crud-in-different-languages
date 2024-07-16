@@ -1,5 +1,5 @@
+import { faker } from '@faker-js/faker'
 import Fastify from 'fastify'
-import * as faker from 'faker'
 
 const fastify = Fastify()
 
@@ -19,8 +19,8 @@ const createUser = (_id: number): User => ({
   _id: _id,
   username: faker.internet.userName(),
   email: faker.internet.email(),
-  fullname: faker.name.findName(),
-  avatarUrl: faker.internet.avatar (),
+  fullname: faker.person.fullName(),
+  avatarUrl: faker.image.avatar (),
 })
 
 const users = Array.from({ length: 10 }, (_, idx) => idx + 1).map(createUser)
@@ -42,7 +42,7 @@ fastify.register(function (fastify, opts, done) {
   }>('/users/:_id', function (req, res) {
     const userId = parseInt(req.params._id)
     const userIndex = users.findIndex(({ _id }) => _id === userId)
-    const user = users[userIndex] = { _id: userId, ...req.body }
+    const user = users[userIndex] = { ...req.body, _id: userId }
     res.send(user)
   })
 
@@ -65,6 +65,6 @@ fastify.get('/', (req, res) => {
   res.send('typescript with fastify')
 })
 
-fastify.listen(3000, () => {
+fastify.listen({ port: 3000 }, () => {
   console.log('server is running at 3000')
 })

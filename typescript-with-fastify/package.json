@@ -5,17 +5,18 @@
   "main": "index.js",
   "scripts": {
     "watch": "tsc --watch ./index.ts",
-    "dev": "nodemon -e js ./index.js"
+    "dev": "concurrently \"npm run watch\" \"nodemon -e js ./index.js\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^16.11.6",
-    "typescript": "^4.4.4"
+    "@types/node": "^20.14.10",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.5.3"
   },
   "dependencies": {
-    "faker": "^5.5.3",
-    "fastify": "^3.22.1"
+    "@faker-js/faker": "^8.4.1",
+    "fastify": "^4.28.1"
   }
 }
