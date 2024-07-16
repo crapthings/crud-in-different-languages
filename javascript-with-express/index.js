@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const faker = require('faker')
+const { faker } = require('@faker-js/faker')
 
 const server = new express()
 const router = express.Router()
@@ -9,8 +9,8 @@ const createUser = (_id) => ({
   _id,
   username: faker.internet.userName(),
   email: faker.internet.email(),
-  fullname: faker.name.findName(),
-  avatarUrl: faker.internet.avatar(),
+  fullname: faker.person.fullName(),
+  avatarUrl: faker.image.avatar(),
 })
 
 const users = Array.from({ length: 10 }, (_, idx) => idx + 1).map(createUser)
